@@ -104,6 +104,39 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
         e = r.nextInt(1000000);			// random int w/ 1000000 upper bound
         return e;
     }
+
+	/**
+	 * Returns the position of the "successor" of p.
+	 * Successor is node which has the smallest element that is larger than element
+	 * e of p.
+	 * @param p: Position of the node whose successor is searched
+	 * @return successorPosition: Position of successor of p (if none, return null)
+	 */
+	private Position<E> succesor(Position<E> p){
+
+	}
+
+	/**
+	 * Returns position of the "predecessor" of p.
+	 * Predecessor is node which has the largest element smaller than
+	 * element e of p.
+	 * @param p: Position of node whose predecessor is searched
+	 * @return predPosition: Position of p's predecessor (if none, return null)
+	 */
+	private Position<E> predecessor(Position<E> p){
+
+	}
+
+	/**
+	 * Deletes node w/ element e from tree (or subtree) with root Position p.
+	 * @param p: Position of the root of tree (or subtree) containing
+	 *            node w/ element e (to be deleted)
+	 * @param e: Element of node to be deleted
+	 * @return e: return e if e exists (otherwise null).
+	 */
+	private E delete(Position<E> p, E e){
+
+	}
 	
 	public static void main(String[] args) {
 		
