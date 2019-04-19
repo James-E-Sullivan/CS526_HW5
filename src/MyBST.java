@@ -112,8 +112,11 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 	 * @param p: Position of the node whose successor is searched
 	 * @return successorPosition: Position of successor of p (if none, return null)
 	 */
-	private Position<E> succesor(Position<E> p){
-
+	private Position<E> successor(Position<E> p){
+		Node<E> n = validate(p);
+		if (isInternal(n))
+			System.out.println("Position is internal");
+		return p;
 	}
 
 	/**
@@ -124,7 +127,15 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 	 * @return predPosition: Position of p's predecessor (if none, return null)
 	 */
 	private Position<E> predecessor(Position<E> p){
-
+		Node<E> n = validate(p);
+		if (isInternal(n.getLeft())){			// if left node of n is internal
+			n = n.getLeft();
+			while (n.getRight() != null && isInternal(n.getRight())){	// while there is an internal right node
+				n = n.getRight();				// traverse to that node
+			}
+			return n;		// return right-most internal node
+		}
+		return null;		// else return null
 	}
 
 	/**
@@ -135,13 +146,34 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 	 * @return e: return e if e exists (otherwise null).
 	 */
 	private E delete(Position<E> p, E e){
+		Node<E> n = validate(p);
+		if (isInternal(n.getLeft()) && isInternal(n.getRight())){
 
+		}
+		return e;
+	}
+
+	/**
+	 * Searches binary search tree and returns position with element e (or null)
+	 * @param root: root position of tree or sub-tree to be searched
+	 * @param e: element for which you are searching
+	 * @return Node n with element e, or null:
+	 */
+	private Position<E> search(Position<E> root, E e){
+		Node<E> n = validate(root);		// n starts as root of tree or subtree to be searched
+		while (n != null){
+			if (comp.compare(n.getElement(), e) == 0){return n;}	// Position found
+			else if (comp.compare(n.getElement(), e) < 0){n = n.getRight();}	// element at p<e
+			else if (comp.compare(n.getElement(), e) > 0){n = n.getLeft();}		// element at p>e
+		}
+		return null;		// Position with element not found
 	}
 	
 	public static void main(String[] args) {
 		
 		MyBST<Integer> t =   new MyBST<>();
 
+		/*
 		// test add method
 		t.add(t.root, 100);
 		t.add(t.root, 50);
@@ -151,7 +183,34 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 		t.add(t.root, 130);
 		t.add(t.root, 140);
 		t.add(t.root, 120);
-		
+		 */
+
+		// create BST to test new methods
+		t.add(t.root, 44);
+		t.add(t.root, 17);
+		t.add(t.root, 8);
+		t.add(t.root, 32);
+		t.add(t.root, 28);
+		t.add(t.root, 21);
+		t.add(t.root, 29);
+		t.add(t.root, 88);
+		t.add(t.root, 65);
+		t.add(t.root, 54);
+		t.add(t.root, 82);
+		t.add(t.root, 76);
+		t.add(t.root, 68);
+		t.add(t.root, 80);
+		t.add(t.root, 97);
+		t.add(t.root, 93);
+
+		Position<Integer> searchResult = t.search(t.root, 88);
+
+		Position<Integer> testPredecessor = t.predecessor(searchResult);
+		if (testPredecessor != null){
+			System.out.println(testPredecessor.getElement());
+		}else{System.out.println("No predecessor");}
+
+		/*
 		System.out.println("Number of nodes is: " + t.size);
 		
 		System.out.println("Print tree horizontally using indentation: ");
@@ -187,6 +246,9 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
         double avgHeight = (double) heightSum / i;						// average height of the 100 trees
         System.out.println("\nAverage height = " + avgHeight +
                 " // this is the average of " + (i-1) + " heights");
+
+		 */
+
 	}
 
 }
