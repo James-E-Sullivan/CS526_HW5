@@ -114,9 +114,14 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 	 */
 	private Position<E> successor(Position<E> p){
 		Node<E> n = validate(p);
-		if (isInternal(n))
-			System.out.println("Position is internal");
-		return p;
+		if (isInternal(n.getRight())){			// if right node of n is internal
+			n = n.getRight();					// set n to its right child
+			while (n.getLeft() != null && isInternal(n.getLeft())){	// while there is an internal left node
+				n = n.getLeft();				// traverse to that node
+			}
+			return n;		// return left-most internal node
+		}
+		return null;		// else return null
 	}
 
 	/**
@@ -129,7 +134,7 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 	private Position<E> predecessor(Position<E> p){
 		Node<E> n = validate(p);
 		if (isInternal(n.getLeft())){			// if left node of n is internal
-			n = n.getLeft();
+			n = n.getLeft();					// set n to its left child
 			while (n.getRight() != null && isInternal(n.getRight())){	// while there is an internal right node
 				n = n.getRight();				// traverse to that node
 			}
@@ -203,12 +208,17 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 		t.add(t.root, 97);
 		t.add(t.root, 93);
 
-		Position<Integer> searchResult = t.search(t.root, 88);
+		Position<Integer> searchResult = t.search(t.root, 44);
 
 		Position<Integer> testPredecessor = t.predecessor(searchResult);
+		Position<Integer> testSuccessor = t.successor(searchResult);
 		if (testPredecessor != null){
 			System.out.println(testPredecessor.getElement());
 		}else{System.out.println("No predecessor");}
+
+		if (testSuccessor != null){
+			System.out.println(testSuccessor.getElement());
+		}else{System.out.println("No successor");}
 
 		/*
 		System.out.println("Number of nodes is: " + t.size);
