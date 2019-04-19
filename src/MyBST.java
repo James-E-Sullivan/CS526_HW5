@@ -151,10 +151,17 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 	 * @return e: return e if e exists (otherwise null).
 	 */
 	private E delete(Position<E> p, E e){
-		Node<E> n = validate(p);
-		if (isInternal(n.getLeft()) && isInternal(n.getRight())){
-
+		Node<E> n = validate(search(p, e));		// n set to position w/ element e
+		Node<E> toBeDeleted = n;
+		if (n == null){return null;}			// no position w/ element e
+		else if (isInternal(n.getLeft()) && isInternal(n.getRight())){	// both children internal
+			Node<E> predecessorNode = validate(predecessor(n));
+			E tempElement = n.getElement();					// store element of n in temp variable
+			n.setElement(predecessorNode.getElement());		// set n's element to predecessor's element
+			predecessorNode.setElement(tempElement);		// predecessor's element set to n's previous element
+			toBeDeleted = predecessorNode;					// Node toBeDeleted set to node w/ element e
 		}
+		remove(toBeDeleted);			// remove node
 		return e;
 	}
 
@@ -190,7 +197,7 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 		t.add(t.root, 120);
 		 */
 
-		// create BST to test new methods
+		// create BST (from pg 465 in textbook) to test new methods
 		t.add(t.root, 44);
 		t.add(t.root, 17);
 		t.add(t.root, 8);
@@ -220,7 +227,7 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 			System.out.println(testSuccessor.getElement());
 		}else{System.out.println("No successor");}
 
-		/*
+
 		System.out.println("Number of nodes is: " + t.size);
 		
 		System.out.println("Print tree horizontally using indentation: ");
@@ -232,7 +239,11 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 
 		System.out.println("\n");
 
+		// test delete method
+		t.delete(t.root, 32);
+		t.print(t.root, 0);
 
+		/*
 		Random r = new Random();					// instantiate new Random object
 		r.setSeed(System.currentTimeMillis());		// set seed based on current system time
 
