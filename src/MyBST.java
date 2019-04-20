@@ -212,7 +212,13 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 		return n;
 	}
 
-
+	/**
+	 * Creates a test MyBST using elements in testArray.
+	 * Prints values of testTree in order, and prints a visual of tree layout.
+	 * Prints the predecessor and successor of every tree element.
+	 * Continuously deletes root of tree until tree empty (prints each step).
+	 * @param testArray: array of elements to be inserted into a test tree
+	 */
 	private static void testMethods(int[] testArray){
 		MyBST<Integer> testTree = new MyBST<>();
 
