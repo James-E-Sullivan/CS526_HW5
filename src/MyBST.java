@@ -1,15 +1,14 @@
 import net.datastructures.*;
-
 import java.util.Comparator;
 import java.util.Random;
 
-// generic binary search tree
+// generic binary findNode tree
 public class MyBST<E> extends LinkedBinaryTree<E> {
 
 	private Comparator<E> comp;
 	private int size = 0;
 	
-	public MyBST(Comparator<E> c) {comp = c;}; // compare by non-naturing ordering
+	public MyBST(Comparator<E> c) {comp = c;} // compare by non-naturing ordering
 	public MyBST(){ this(new DefaultComparator<E>()); } // compare by natural ordering
 	
 	public int size() { return size; }
@@ -114,14 +113,16 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 	 */
 	private Position<E> successor(Position<E> p){
 		Node<E> n = validate(p);
-		if (isInternal(n.getRight())){			// if right node of n is internal
-			n = n.getRight();					// set n to its right child
-			while (n.getLeft() != null && isInternal(n.getLeft())){	// while there is an internal left node
-				n = n.getLeft();				// traverse to that node
-			}
-			return n;		// return left-most internal node
+		if (n.getRight() != null)				// if right child exists
+			return treeMinimum(n.getRight());	// return node w/ min value in right child subtree
+		Node<E> y = n.getParent();
+
+		// return successor or return null
+		while (y != null && n == y.getRight()){
+			n = y;
+			y = y.getParent();
 		}
-		return null;		// else return null
+		return y;
 	}
 
 	/**
@@ -133,14 +134,16 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 	 */
 	private Position<E> predecessor(Position<E> p){
 		Node<E> n = validate(p);
-		if (isInternal(n.getLeft())){			// if left node of n is internal
-			n = n.getLeft();					// set n to its left child
-			while (n.getRight() != null && isInternal(n.getRight())){	// while there is an internal right node
-				n = n.getRight();				// traverse to that node
-			}
-			return n;		// return right-most internal node
+		if (n.getLeft() != null)				// if left child exists
+			return treeMaximum(n.getLeft());	// return nod w/ max value in left child subtree
+		Node<E> y = n.getParent();
+
+		// return predecessor or return null
+		while (y != null && n == y.getLeft()){
+			n = y;
+			y = y.getParent();
 		}
-		return null;		// else return null
+		return y;
 	}
 
 	/**
@@ -150,28 +153,31 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 	 * @param e: Element of node to be deleted
 	 * @return e: return e if e exists (otherwise null).
 	 */
-	private E delete(Position<E> p, E e){
-		Node<E> n = validate(search(p, e));		// n set to position w/ element e
-		Node<E> toBeDeleted = n;
-		if (n == null){return null;}			// no position w/ element e
-		else if (isInternal(n.getLeft()) && isInternal(n.getRight())){	// both children internal
-			Node<E> predecessorNode = validate(predecessor(n));
-			E tempElement = n.getElement();					// store element of n in temp variable
-			n.setElement(predecessorNode.getElement());		// set n's element to predecessor's element
-			predecessorNode.setElement(tempElement);		// predecessor's element set to n's previous element
-			toBeDeleted = predecessorNode;					// Node toBeDeleted set to node w/ element e
-		}
-		remove(toBeDeleted);			// remove node
-		return e;
+	public E delete(Position<E> p, E e){
+		Node<E> toBeDeleted = validate(findNode(p, e));		// n set to position w/ element e
+
+		if (numChildren(toBeDeleted) <= 1)		// if number of children is 0 or 1
+			return remove(toBeDeleted);			// remove node and return its element
+
+		// get predecessor node of toBeDeleted
+		Node<E> predecessorNode = validate(predecessor(toBeDeleted));
+
+		// swap elements of toBeDeleted and its predecessor
+		E tempElement = toBeDeleted.getElement();
+		toBeDeleted.setElement(predecessorNode.getElement());
+		predecessorNode.setElement(tempElement);
+
+		// remove predecessor (with former toBeDeleted value), return its element
+		return remove(predecessorNode);
 	}
 
 	/**
-	 * Searches binary search tree and returns position with element e (or null)
+	 * Searches binary findNode tree and returns position with element e (or null)
 	 * @param root: root position of tree or sub-tree to be searched
 	 * @param e: element for which you are searching
 	 * @return Node n with element e, or null:
 	 */
-	private Position<E> search(Position<E> root, E e){
+	private Position<E> findNode(Position<E> root, E e){
 		Node<E> n = validate(root);		// n starts as root of tree or subtree to be searched
 		while (n != null){
 			if (comp.compare(n.getElement(), e) == 0){return n;}	// Position found
@@ -180,95 +186,85 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 		}
 		return null;		// Position with element not found
 	}
+
+
+	/**
+	 * Finds node w/ maximum value in tree/subtree with root p
+	 * @param p: root of tree or subtree
+	 * @return n: the node with tree's maximum value
+	 */
+	private Position<E> treeMaximum(Position<E> p){
+		Node<E> n = validate(p);
+		while (n.getRight() != null)
+			n = n.getRight();
+		return n;
+	}
+
+	/**
+	 * Finds node w/ minimum value in tree/subtree with root p
+	 * @param p: root of tree or subtree
+	 * @return n: the node with tree's minimum value
+	 */
+	private Position<E> treeMinimum(Position<E> p){
+		Node<E> n = validate(p);
+		while (n.getLeft() != null)
+			n = n.getLeft();
+		return n;
+	}
+
+
+	private static void testMethods(int[] testArray){
+		MyBST<Integer> testTree = new MyBST<>();
+
+		// create MyBST testTree with values from testArray
+		for (int e : testArray)
+			testTree.add(testTree.root, e);
+
+		// Print out testTree elements and a visual of the tree
+		System.out.println("Values of testTree, in order: ");
+		testTree.inorderPrint(testTree.root);
+		System.out.println("\n\nHorizontal visual of testTree: \n");
+		testTree.print(testTree.root, 0);
+
+		// test predecessor and successor methods
+		for (int e : testArray){
+			Position<Integer> testPredecessor = testTree.predecessor(
+					testTree.findNode(testTree.root, e));
+			Position<Integer> testSuccessor = testTree.successor(
+					testTree.findNode(testTree.root, e));
+
+			System.out.println("\nElement: " + e);
+
+			if (testPredecessor == null)
+				System.out.println("Predecessor: null");
+			else
+				System.out.println("Predecessor: " + testPredecessor.getElement());
+
+			if (testSuccessor == null)
+				System.out.println("Successor: null");
+			else
+				System.out.println("Successor: " + testSuccessor.getElement());
+		}
+
+		// test delete method by deleting the root of the tree
+		System.out.println("\nDeleting root node until tree is empty: ");
+		System.out.println("----------------------------------------");
+		while(testTree.root != null){
+			testTree.print(testTree.root, 0);
+			testTree.delete(testTree.root, testTree.root.getElement());
+			System.out.println("----------------------------------------");
+		}
+		System.out.println();
+	}
 	
 	public static void main(String[] args) {
-		
-		MyBST<Integer> t =   new MyBST<>();
 
-		/*
-		// test add method
-		t.add(t.root, 100);
-		t.add(t.root, 50);
-		t.add(t.root, 150);
-		t.add(t.root, 70);
-		t.add(t.root, 30);
-		t.add(t.root, 130);
-		t.add(t.root, 140);
-		t.add(t.root, 120);
-		 */
+		int[] testArray1 = new int[] {100, 50, 150, 35, 70, 130, 120, 140};
+		testMethods(testArray1);
 
-		// create BST (from pg 465 in textbook) to test new methods
-		t.add(t.root, 44);
-		t.add(t.root, 17);
-		t.add(t.root, 8);
-		t.add(t.root, 32);
-		t.add(t.root, 28);
-		t.add(t.root, 21);
-		t.add(t.root, 29);
-		t.add(t.root, 88);
-		t.add(t.root, 65);
-		t.add(t.root, 54);
-		t.add(t.root, 82);
-		t.add(t.root, 76);
-		t.add(t.root, 68);
-		t.add(t.root, 80);
-		t.add(t.root, 97);
-		t.add(t.root, 93);
-
-		Position<Integer> searchResult = t.search(t.root, 44);
-
-		Position<Integer> testPredecessor = t.predecessor(searchResult);
-		Position<Integer> testSuccessor = t.successor(searchResult);
-		if (testPredecessor != null){
-			System.out.println(testPredecessor.getElement());
-		}else{System.out.println("No predecessor");}
-
-		if (testSuccessor != null){
-			System.out.println(testSuccessor.getElement());
-		}else{System.out.println("No successor");}
-
-
-		System.out.println("Number of nodes is: " + t.size);
-		
-		System.out.println("Print tree horizontally using indentation: ");
-		t.print(t.root, 0);
-		System.out.println("\n");
-		
-		System.out.println("Print tree by inorder traversal: ");
-		t.inorderPrint(t.root);
-
-		System.out.println("\n");
-
-		// test delete method
-		t.delete(t.root, 32);
-		t.print(t.root, 0);
-
-		/*
-		Random r = new Random();					// instantiate new Random object
-		r.setSeed(System.currentTimeMillis());		// set seed based on current system time
-
-
-        int heightSum = 0;						// int used to sum the height of all trees
-        int i;
-        for (i=1; i <= 100; i++){				// create 100 trees
-            int j;
-            MyBST<Integer> avgHeightTree = new MyBST<>();
-            for (j=0; j < 1000; j++){									// fill each tree with 1000 nodes
-                Integer randomNumber = getRandomInt(r);					// get random number
-                avgHeightTree.add(avgHeightTree.root, randomNumber);	// each node element is pseudo-random number
-            }
-
-            int maxHeight = avgHeightTree.height(avgHeightTree.root);	// height is max depth of Tree, from root
-
-            System.out.println("Height = " + maxHeight + ", " + "Size = " + avgHeightTree.size);
-            heightSum += maxHeight;		// add height of tree to the previous sum of all tree heights
-        }
-
-        double avgHeight = (double) heightSum / i;						// average height of the 100 trees
-        System.out.println("\nAverage height = " + avgHeight +
-                " // this is the average of " + (i-1) + " heights");
-
-		 */
+		int[] testArray2 = new int[] {44, 17, 8, 32, 28, 21, 29, 88, 65,
+				54, 82, 76, 68, 80, 97, 93};
+		testMethods(testArray2);
 
 	}
 
