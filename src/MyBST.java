@@ -7,10 +7,10 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 
 	private Comparator<E> comp;
 	private int size = 0;
-	
+
 	public MyBST(Comparator<E> c) {comp = c;} // compare by non-naturing ordering
 	public MyBST(){ this(new DefaultComparator<E>()); } // compare by natural ordering
-	
+
 	public int size() { return size; }
 	public boolean isEmpty() { return size() == 0; }
 
@@ -57,10 +57,10 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 
 	// print a binary tree horizontally using indentation
 	public void print(Position<E> p, int depth){
-		
-		  Node<E> n = validate(p); 
+
+		  Node<E> n = validate(p);
 	      int i;
-	   
+
 	      for (i = 1; i <= depth; i++)
 	         System.out.print("    ");
 	      System.out.println(n.getElement());
@@ -151,10 +151,16 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 	 * @param p: Position of the root of tree (or subtree) containing
 	 *            node w/ element e (to be deleted)
 	 * @param e: Element of node to be deleted
-	 * @return e: return e if e exists (otherwise null).
+	 * @return element of deleted node (otherwise null).
 	 */
 	public E delete(Position<E> p, E e){
-		Node<E> toBeDeleted = validate(findNode(p, e));		// n set to position w/ element e
+
+	    // search for node and test if it is null
+	    Position<E> foundPosition = findNode(p, e);
+	    if (foundPosition == null)
+	        return null;
+
+		Node<E> toBeDeleted = validate(foundPosition);		// toBeDeleted set to position w/ element e
 
 		if (numChildren(toBeDeleted) <= 1)		// if number of children is 0 or 1
 			return remove(toBeDeleted);			// remove node and return its element
@@ -216,6 +222,7 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 	 * Creates a test MyBST using elements in testArray.
 	 * Prints values of testTree in order, and prints a visual of tree layout.
 	 * Prints the predecessor and successor of every tree element.
+     * Tests if deleting a non-existent value returns null.
 	 * Continuously deletes root of tree until tree empty (prints each step).
 	 * @param testArray: array of elements to be inserted into a test tree
 	 */
@@ -252,6 +259,13 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 				System.out.println("Successor: " + testSuccessor.getElement());
 		}
 
+		// test delete method on non-existent position; assumes - 999999 not in tree
+        Integer testDelete = testTree.delete(testTree.root, -999999);
+		if (testDelete == null)
+		    System.out.println("\ndelete method: Non-existent position correctly returns null.");
+		else
+		    System.out.println("\ndelete method: Non-existent position falsely returned value.");
+
 		// test delete method by deleting the root of the tree
 		System.out.println("\nDeleting root node until tree is empty: ");
 		System.out.println("----------------------------------------");
@@ -262,7 +276,7 @@ public class MyBST<E> extends LinkedBinaryTree<E> {
 		}
 		System.out.println();
 	}
-	
+
 	public static void main(String[] args) {
 
 		int[] testArray1 = new int[] {100, 50, 150, 35, 70, 130, 120, 140};
